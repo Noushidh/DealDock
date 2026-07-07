@@ -1,15 +1,11 @@
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import notyf from "../../utils/notyf";
-import type { LoginResponse, AuthForm } from "../../types/auth";
-import { useDispatch } from "react-redux";
-import { loginSuccess } from "../../features/authslice";
+import type { AuthForm } from "../../types/auth";
 import { useNavigate } from "react-router-dom";
 
-function Login() {
-  const dispatch = useDispatch();
+function Register() {
   const navigate = useNavigate();
-
   const {
     register,
     handleSubmit,
@@ -18,15 +14,12 @@ function Login() {
 
   const onsubmit = async (data: AuthForm) => {
     try {
-      const response = await axios.post<LoginResponse>(
-        "http://localhost:5000/api/login",
+      const response = await axios.post(
+        "http://localhost:5000/api/register",
         data,
       );
-      dispatch(
-        loginSuccess({ user: response.data.user, token: response.data.token }),
-      );
       notyf.success(response.data.message);
-      navigate('/sell')
+      navigate('/login')
     } catch (error: any) {
       notyf.error(error.response?.data?.message);
     }
@@ -64,10 +57,10 @@ function Login() {
         {errors.password && (
           <p className="text-red-500">{errors.password.message}</p>
         )}
-        <button type="submit">Login</button>
+        <button type="submit">Register</button>
       </form>
     </>
   );
 }
 
-export default Login;
+export default Register;
