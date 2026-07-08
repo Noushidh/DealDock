@@ -1,10 +1,9 @@
+import "./config/env.js"
 import express from "express";
-import dotenv from "dotenv";
 import connectDb from "./config/db.js";
 import cors from "cors";
-import authRoutes from "./routes/authController.js";
-
-dotenv.config();
+import authRoutes from "./routes/authRoutes.js";
+import productRoutes from "./routes/productRoutes.js"
 
 const app = express();
 
@@ -15,6 +14,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api", authRoutes);
+app.use("/api",productRoutes)
 
 const PORT = process.env.PORT;
 
