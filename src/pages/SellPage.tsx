@@ -5,17 +5,25 @@ import ProductListing from "../components/Sell/productList";
 import { useDispatch } from "react-redux";
 import { setSelectedProduct } from "../features/productSlice";
 import type { Product } from "../types/product";
+import ProductDeleteModal from "../components/Sell/productDeleteModal";
 
 function SellPage() {
   const dispatch = useDispatch();
   const [isOpen, setIsopen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
+  const [isdelete,setIsdelete]=useState(false);
+  const [selectedProductId,setSelectedProductId]=useState<null|string>(null)
 
   const handleEdit = (product: Product) => {
     dispatch(setSelectedProduct(product));
     setIsopen(true);
     setIsEdit(true)
   };
+
+  const handleDelete = (id:string)=>{
+    setSelectedProductId(id)
+    setIsdelete(true);
+  }
   return (
     <>
       <Navbar onSellClick={() => {
@@ -24,7 +32,8 @@ function SellPage() {
     }}
       />
       {isOpen && <ProductModal isEdit={isEdit} onClose={() => setIsopen(false)} />}
-      <ProductListing onEdit={handleEdit} />
+      <ProductListing onEdit={handleEdit} onDelete={handleDelete}/>
+      {isdelete && <ProductDeleteModal productId={selectedProductId} onClose={()=>setIsdelete(false)}/>}
     </>
   );
 }

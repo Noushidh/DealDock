@@ -4,15 +4,18 @@ import axios from "axios";
 import { useEffect } from "react";
 import type { RootState } from "../../app/store";
 import type { Product } from "../../types/product";
+import { useNavigate } from "react-router-dom";
 
 type Props = {
   onEdit: (product: Product) => void;
+  onDelete: (id: string) => void;
 };
 
-function ProductListing({onEdit}:Props) {
+function ProductListing({ onEdit, onDelete }: Props) {
+  const navigate = useNavigate()
   const dispatch = useDispatch();
   const products = useSelector((state: RootState) => state.product.products);
-  console.log(products)
+  console.log(products);
 
   const fetchProducts = async () => {
     const response = await axios.get("http://localhost:5000/api/products");
@@ -44,8 +47,18 @@ function ProductListing({onEdit}:Props) {
 
           <p>₹{product.price}</p>
 
-          <button onClick={()=>onEdit(product)}>edit</button>
-          <button>delete</button>
+          <button onClick={()=>navigate(`/product/${product._id}`)}>view</button>
+          <button >Add to cart</button>
+
+          <div className="flex justify-end gap-2">
+            <button onClick={() => onEdit(product)}
+              className="rounded bg-blue-500 px-3 py-1 text-white hover:bg-blue-600"
+            >Edit</button>
+
+            <button onClick={() => onDelete(product._id)}
+              className="rounded bg-red-500 px-3 py-1 text-white hover:bg-red-600"
+            >Delete </button>
+          </div>
         </div>
       ))}
     </div>
