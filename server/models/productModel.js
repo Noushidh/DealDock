@@ -12,10 +12,12 @@ const productSchema = new mongoose.Schema({
     },
     description:{
          type:String,
+         required:true
     },
-    imageUrl:{
+    images:[{
        type:String,
-    }
+       required:true
+    }]
 })
 
 export default mongoose.model("Product",productSchema);

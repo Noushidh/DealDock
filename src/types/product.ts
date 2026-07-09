@@ -1,8 +1,9 @@
 
 export type Product = {
+    _id:string;
     title:string;
     price:string;
     description:string;
-    image:FileList;
+    images:string[];
     isSold?:boolean;
 }
