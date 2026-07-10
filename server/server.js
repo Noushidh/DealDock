@@ -5,7 +5,7 @@ import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
 import productRoutes from "./routes/productRoutes.js"
 import checkoutRoutes from "./routes/checkoutRoutes.js"
-import { errorHandler } from "./middleware/errorHanling.js";
+import { errorHandler } from "./middleware/errorHandling.js";
 
 const app = express();
 
