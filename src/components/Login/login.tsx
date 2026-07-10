@@ -26,7 +26,7 @@ function Login() {
         loginSuccess({ user: response.data.user, token: response.data.token }),
       );
       notyf.success(response.data.message);
-      navigate('/sell')
+      navigate("/sell");
     } catch (error: any) {
       notyf.error(error.response?.data?.message);
     }

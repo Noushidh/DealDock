@@ -3,10 +3,11 @@ import type { Product } from "../../types/product";
 import axios from "axios";
 import notyf from "../../utils/notyf";
 import { useDispatch } from "react-redux";
-import { addProduct,updateProduct } from "../../features/productSlice";
+import { addProduct, updateProduct } from "../../features/productSlice";
 import type { RootState } from "../../app/store";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
+import { getAuthHeader } from "../../utils/authHeader";
 
 function ProductModal({
   onClose,
@@ -21,7 +22,7 @@ function ProductModal({
     (state: RootState) => state.product.selectedProduct,
   );
 
-  console.log(selectedProduct);
+  const token = useSelector((state: RootState) => state.auth.token);
 
   const {
     register,
@@ -58,12 +59,14 @@ function ProductModal({
         response = await axios.patch(
           `http://localhost:5000/api/editProduct/${selectedProduct._id}`,
           formData,
+          getAuthHeader(token),
         );
-        dispatch(updateProduct(response.data.product))
+        dispatch(updateProduct(response.data.product));
       } else {
         response = await axios.post(
           "http://localhost:5000/api/addProduct",
           formData,
+          getAuthHeader(token),
         );
         dispatch(addProduct(response.data.product));
       }
@@ -71,6 +74,7 @@ function ProductModal({
       notyf.success(response.data.message);
       onClose();
     } catch (error: any) {
+      console.log(error);
       notyf.error(error.response?.data?.message || "Something went wrong");
     }
   };
