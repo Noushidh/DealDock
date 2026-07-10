@@ -4,6 +4,8 @@ import connectDb from "./config/db.js";
 import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
 import productRoutes from "./routes/productRoutes.js"
+import checkoutRoutes from "./routes/checkoutRoutes.js"
+import { errorHandler } from "./middleware/errorHanling.js";
 
 const app = express();
 
@@ -14,7 +16,10 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api", authRoutes);
-app.use("/api",productRoutes)
+app.use("/api",productRoutes);
+app.use("/api",checkoutRoutes);
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT;
 

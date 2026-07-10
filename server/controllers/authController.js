@@ -3,7 +3,7 @@ import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 
 
-export const login =async (req,res)=>{
+export const login =async (req,res,next)=>{
     try{
     const{email,password}=req.body
 
@@ -35,12 +35,12 @@ export const login =async (req,res)=>{
    return res.status(200).json({success:true,message:"Login sucessful",user:{id:user._id,email:user.email},token})
 
     }catch(error){
-      res.status(500).json({sucess:false})
+      next(error)
     }
 
 }
 
-export const register = async (req,res)=>{
+export const register = async (req,res,next)=>{
   try{
       const{email,password}=req.body
 
@@ -57,7 +57,6 @@ export const register = async (req,res)=>{
     res.status(201).json({success:true,message:"user registered successfully"})
     
   }catch(error){
-      res.status(500).json({success:false})
-
+   next(error)
   }
 }

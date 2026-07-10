@@ -1,12 +1,12 @@
 import Product from "../models/productModel.js";
 
 export const fetchProducts = async (req, res) => {
-  const products = await Product.find();
+  const products = await Product.find({ isSold: false });
 
   res.status(200).json({ success: true, products });
 };
 
-export const AddProduct = async (req, res) => {
+export const AddProduct = async (req, res, next) => {
   try {
     const { title, price, description } = req.body;
 
@@ -21,11 +21,11 @@ export const AddProduct = async (req, res) => {
       .status(201)
       .json({ success: true, message: "Product added successfully", product });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    next(error);
   }
 };
 
-export const EditProduct = async (req, res) => {
+export const EditProduct = async (req, res, next) => {
   try {
     const { title, price, description } = req.body;
     const id = req.params.id;
@@ -46,17 +46,16 @@ export const EditProduct = async (req, res) => {
 
     res.status(200).json({ message: "Product updated successfully", product });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ success: false, message: error.message });
+    next(error);
   }
 };
 
-export const DeleteProduct = async (req, res) => {
+export const DeleteProduct = async (req, res, next) => {
   try {
     const id = req.params.id;
     const product = await Product.findByIdAndDelete(id);
     res.status(200).json({ success: true, message: "delete successfully", id });
   } catch (error) {
-    res.status(500).json({success:false,message:"Something went wrong"})
+    next(error);
   }
 };

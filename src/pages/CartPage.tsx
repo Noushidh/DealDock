@@ -48,6 +48,7 @@ function CartPage() {
           </div>
         ))
       )}
+      {cartItems.length !== 0 &&(<button className="bg-green-500 text-white" onClick={()=>navigate('/checkout')}>Checkout</button>)}
     </div>
   );
 }

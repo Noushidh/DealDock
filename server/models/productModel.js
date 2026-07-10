@@ -1,5 +1,6 @@
 
 import mongoose from "mongoose";
+import { type } from "os";
 
 const productSchema = new mongoose.Schema({
     title:{
@@ -17,7 +18,11 @@ const productSchema = new mongoose.Schema({
     images:[{
        type:String,
        required:true
-    }]
+    }],
+    isSold:{
+      type:Boolean,
+      default:false,
+    }
 })
 
 export default mongoose.model("Product",productSchema);
