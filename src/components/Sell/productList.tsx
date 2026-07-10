@@ -1,10 +1,11 @@
 import { useDispatch, useSelector } from "react-redux";
-import { setProducts } from "../../features/productSlice";
-import axios from "axios";
 import { useEffect } from "react";
 import type { RootState } from "../../app/store";
 import type { Product } from "../../types/product";
 import { useNavigate } from "react-router-dom";
+import AddToCartButton from "../../components/cart/addTocart";
+import { fetchProducts } from "../../features/productThunk";
+import type { AppDispatch } from "../../app/store";
 
 type Props = {
   onEdit: (product: Product) => void;
@@ -12,20 +13,25 @@ type Props = {
 };
 
 function ProductListing({ onEdit, onDelete }: Props) {
-  const navigate = useNavigate()
-  const dispatch = useDispatch();
-  const products = useSelector((state: RootState) => state.product.products);
+  const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+
+  const { products, loading, error } = useSelector(
+    (state: RootState) => state.product,
+  );
   console.log(products);
 
-  const fetchProducts = async () => {
-    const response = await axios.get("http://localhost:5000/api/products");
-
-    dispatch(setProducts(response.data.products));
-  };
-
   useEffect(() => {
-    fetchProducts();
-  }, []);
+    dispatch(fetchProducts());
+  }, [dispatch]);
+
+  
+  if (loading) {
+    return <h2>Loading ....</h2>;
+  }
+  if (error) {
+    return <h2>{error}</h2>;
+  }
 
   return (
     <div className="border">
@@ -47,17 +53,26 @@ function ProductListing({ onEdit, onDelete }: Props) {
 
           <p>₹{product.price}</p>
 
-          <button onClick={()=>navigate(`/product/${product._id}`)}>view</button>
-          <button >Add to cart</button>
+          <button onClick={() => navigate(`/product/${product._id}`)}>
+            view
+          </button>
+
+          <AddToCartButton product={product} />
 
           <div className="flex justify-end gap-2">
-            <button onClick={() => onEdit(product)}
+            <button
+              onClick={() => onEdit(product)}
               className="rounded bg-blue-500 px-3 py-1 text-white hover:bg-blue-600"
-            >Edit</button>
+            >
+              Edit
+            </button>
 
-            <button onClick={() => onDelete(product._id)}
+            <button
+              onClick={() => onDelete(product._id)}
               className="rounded bg-red-500 px-3 py-1 text-white hover:bg-red-600"
-            >Delete </button>
+            >
+              Delete{" "}
+            </button>
           </div>
         </div>
       ))}

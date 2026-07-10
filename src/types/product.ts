@@ -5,5 +5,6 @@ export type Product = {
     price:string;
     description:string;
     images:string[];
+    quantity:number;
     isSold?:boolean;
 }

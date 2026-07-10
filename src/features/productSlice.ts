@@ -1,39 +1,62 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { Product } from "../types/product";
+import { fetchProducts } from "./productThunk";
 
 type ProductState = {
   products: Product[];
-  selectedProduct:Product|null;
+  selectedProduct: Product | null;
+  loading: boolean;
+  error: string | null;
 };
 
 const initialState: ProductState = {
   products: [],
-  selectedProduct:null
+  selectedProduct: null,
+  loading: false,
+  error: null,
 };
 
 const productSlice = createSlice({
   name: "product",
   initialState,
   reducers: {
-    setProducts: (state, action: PayloadAction<Product[]>) => {
-      state.products = action.payload;
-    },
     addProduct: (state, action: PayloadAction<Product>) => {
       state.products.push(action.payload);
     },
-    setSelectedProduct:(state,action:PayloadAction<Product|null>)=>{
-       state.selectedProduct = action.payload;
+    setSelectedProduct: (state, action: PayloadAction<Product | null>) => {
+      state.selectedProduct = action.payload;
     },
-    updateProduct :(state,action:PayloadAction<Product>)=>{
-       state.products = state.products.map((product)=>(
-        product._id === action.payload._id ? action.payload:product
-       ))
+    updateProduct: (state, action: PayloadAction<Product>) => {
+      state.products = state.products.map((product) =>
+        product._id === action.payload._id ? action.payload : product,
+      );
     },
-    deleteProduct:(state,action:PayloadAction<string>)=>{
-        state.products = state.products.filter((product)=>product._id !== action.payload)
-    }
+    deleteProduct: (state, action: PayloadAction<string>) => {
+      state.products = state.products.filter(
+        (product) => product._id !== action.payload,
+      );
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchProducts.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchProducts.fulfilled, (state, action) => {
+        state.loading = false;
+        state.products = action.payload;
+      })
+      .addCase(fetchProducts.rejected, (state, action) => {
+        state.error = action.error.message ?? "something went wrong";
+        state.loading = false;
+      });
   },
 });
 
-export const { setProducts, addProduct ,setSelectedProduct,updateProduct,deleteProduct} = productSlice.actions;
+export const {
+  addProduct,
+  setSelectedProduct,
+  updateProduct,
+  deleteProduct,
+} = productSlice.actions;
 export default productSlice.reducer;
