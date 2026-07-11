@@ -60,3 +60,7 @@ export const register = async (req,res,next)=>{
    next(error)
   }
 }
+
+export const Logout =async (req,res)=>{
+  res.status(200).json({success:true,message:"Logout successfullyy"})
+}
