@@ -16,16 +16,33 @@ function ProductListing({ onEdit, onDelete }: Props) {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
 
-  const { products, loading, error } = useSelector(
+  const { products, loading, error, price, search } = useSelector(
     (state: RootState) => state.product,
   );
-  console.log(products);
+  const filteredProducts = products.filter((product) => {
+    const matchesSearch = product.title
+      .toLowerCase()
+      .includes(search.toLowerCase());
+
+    let matchesPrice = true;
+
+    if (price === "0-1000") {
+      matchesPrice = product.price >= 0 && product.price <= 1000;
+    } else if (price === "1000-3000") {
+      matchesPrice = product.price > 1000 && product.price <= 3000;
+    } else if (price === "3000-9000") {
+      matchesPrice = product.price > 3000 && product.price <= 9000;
+    } else if (price === "9000+") {
+      matchesPrice = product.price > 9000;
+    }
+
+    return matchesSearch && matchesPrice;
+  });
 
   useEffect(() => {
     dispatch(fetchProducts());
   }, [dispatch]);
 
-  
   if (loading) {
     return <h2>Loading ....</h2>;
   }
@@ -35,7 +52,7 @@ function ProductListing({ onEdit, onDelete }: Props) {
 
   return (
     <div className="border">
-      {products.map((product) => (
+      {filteredProducts.map((product) => (
         <div key={product._id} className="border p-4 mb-4">
           <div className="flex gap-2">
             {product.images.map((image, index) => (

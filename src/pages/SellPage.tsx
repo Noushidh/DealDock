@@ -2,10 +2,11 @@ import { useState } from "react";
 import Navbar from "../components/Navbar/Navbar";
 import ProductModal from "../components/Sell/ProductModal";
 import ProductListing from "../components/Sell/productList";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { setSelectedProduct } from "../features/productSlice";
 import type { Product } from "../types/product";
 import ProductDeleteModal from "../components/Sell/productDeleteModal";
+import FilterProducts from "../components/Sell/FilterProducts";
 
 
 function SellPage() {
@@ -33,6 +34,7 @@ function SellPage() {
       setIsopen(true)
     }}
       />
+      <FilterProducts/>
       {isOpen && <ProductModal isEdit={isEdit} onClose={() => setIsopen(false)} />}
       <ProductListing onEdit={handleEdit} onDelete={handleDelete}/>
       {isdelete && <ProductDeleteModal productId={selectedProductId} onClose={()=>setIsdelete(false)}/>}

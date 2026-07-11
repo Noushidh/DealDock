@@ -2,8 +2,8 @@ import axios from "axios";
 import notyf from "../../utils/notyf";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteProduct } from "../../features/productSlice";
-import { getAuthHeader } from "../../utils/authHeader";
 import type { RootState } from "../../app/store";
+import { getAuthHeader } from "../../utils/getAuthHeader";
 
 type Props = {
   productId: string | null;

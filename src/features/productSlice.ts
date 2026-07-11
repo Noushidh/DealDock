@@ -7,6 +7,8 @@ type ProductState = {
   selectedProduct: Product | null;
   loading: boolean;
   error: string | null;
+  search:string;
+  price:string;
 };
 
 const initialState: ProductState = {
@@ -14,6 +16,8 @@ const initialState: ProductState = {
   selectedProduct: null,
   loading: false,
   error: null,
+  search:"",
+  price:""
 };
 
 const productSlice = createSlice({
@@ -36,6 +40,12 @@ const productSlice = createSlice({
         (product) => product._id !== action.payload,
       );
     },
+    setSearch(state,action:PayloadAction<string>){
+      state.search = action.payload
+    },
+    setPrice(state,action:PayloadAction<string>){
+      state.price = action.payload
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -58,5 +68,7 @@ export const {
   setSelectedProduct,
   updateProduct,
   deleteProduct,
+  setSearch,
+  setPrice
 } = productSlice.actions;
 export default productSlice.reducer;

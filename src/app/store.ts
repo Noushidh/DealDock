@@ -12,5 +12,6 @@ import checkoutSlice from "../features/checkoutSlice"
     checkout:checkoutSlice
   },
 });
+
 export type RootState = ReturnType<typeof store.getState>
 export type AppDispatch = typeof store.dispatch;

@@ -7,7 +7,7 @@ import { addProduct, updateProduct } from "../../features/productSlice";
 import type { RootState } from "../../app/store";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
-import { getAuthHeader } from "../../utils/authHeader";
+import { getAuthHeader } from "../../utils/getAuthHeader";
 
 function ProductModal({
   onClose,

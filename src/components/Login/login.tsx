@@ -25,6 +25,7 @@ function Login() {
       dispatch(
         loginSuccess({ user: response.data.user, token: response.data.token }),
       );
+      localStorage.setItem("token",response.data.token)
       notyf.success(response.data.message);
       navigate("/sell");
     } catch (error: any) {
