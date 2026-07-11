@@ -1,6 +1,7 @@
 import type { RootState } from "../../app/store";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import Logout from "../Logout/Logout";
 
 type NavbarProps = {
   onSellClick: () => void;
@@ -28,9 +29,7 @@ function Navbar({ onSellClick }: NavbarProps) {
         Sell Product
       </button>
 
-      <button className="bg-red-500 text-white font-semibold px-5 py-2 rounded-lg shadow hover:bg-red-600 hover:scale-105 transition-all duration-200">
-        Logout
-      </button>
+      <Logout/>
     </div>
   );
 }
