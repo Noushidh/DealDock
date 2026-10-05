@@ -4,16 +4,22 @@ import { useNavigate, useParams } from "react-router-dom";
 import AddToCartButton from "../components/cart/addTocart";
 
 function ProductDetailsPage() {
-  const navigte = useNavigate()
+  const navigte = useNavigate();
   const { id } = useParams();
   const products = useSelector((state: RootState) => state.product.products);
+  const user = useSelector((state: RootState) => state.auth.user);
   const product = products.find((item) => item._id === id);
   if (!product) {
     return <p>Product not found.</p>;
   }
   return (
     <div className="max-w-4xl mx-auto bg-gray-100 rounded-2xl shadow-lg p-6">
-        <button className="mb-5 border bg-black rounded text-white" onClick={()=>navigte(-1)}>go back</button>
+      <button
+        className="mb-5 border bg-black rounded text-white"
+        onClick={() => navigte(-1)}
+      >
+        go back
+      </button>
       <div className="flex gap-4 flex-wrap mb-6">
         {product?.images.map((image, index) => (
           <div
@@ -39,7 +45,7 @@ function ProductDetailsPage() {
         </p>
 
         <div className="flex justify-end">
-          <AddToCartButton product={product} />
+          {user?.id !== product.owner && <AddToCartButton product={product} />}
         </div>
       </div>
     </div>

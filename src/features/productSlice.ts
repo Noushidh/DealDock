@@ -7,17 +7,27 @@ type ProductState = {
   selectedProduct: Product | null;
   loading: boolean;
   error: string | null;
-  search:string;
-  price:string;
+  price: string;
+  wishlist: string[];
+  search:string
+
+  currentPage: number;
+  totalPages: number;
+  totalProducts: number;
 };
 
 const initialState: ProductState = {
   products: [],
+  wishlist: [],
   selectedProduct: null,
   loading: false,
   error: null,
   search:"",
-  price:""
+  price: "",
+
+  currentPage: 1,
+  totalPages: 1,
+  totalProducts: 0,
 };
 
 const productSlice = createSlice({
@@ -40,12 +50,27 @@ const productSlice = createSlice({
         (product) => product._id !== action.payload,
       );
     },
-    setSearch(state,action:PayloadAction<string>){
-      state.search = action.payload
+    setSearch(state, action: PayloadAction<string>) {
+      state.search = action.payload;
     },
-    setPrice(state,action:PayloadAction<string>){
-      state.price = action.payload
-    }
+
+    setPrice(state, action: PayloadAction<string>) {
+      state.price = action.payload;
+    },
+    setFilteredProducts: (
+      state,
+      action: PayloadAction<{
+        products: Product[];
+        currentPage: number;
+        totalPages: number;
+        totalProducts: number;
+      }>,
+    ) => {
+      state.products = action.payload.products;
+      state.currentPage = action.payload.currentPage;
+      state.totalPages = action.payload.totalPages;
+      state.totalProducts = action.payload.totalProducts;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -69,6 +94,7 @@ export const {
   updateProduct,
   deleteProduct,
   setSearch,
-  setPrice
+  setPrice,
+  setFilteredProducts,
 } = productSlice.actions;
 export default productSlice.reducer;

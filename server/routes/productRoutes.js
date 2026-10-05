@@ -9,5 +9,6 @@ router.get('/products',Product.fetchProducts)
 router.post('/addProduct',protect,upload.array("images",10),Product.AddProduct)
 router.patch('/editProduct/:id',protect,upload.array("images",10),Product.EditProduct)
 router.delete('/deleteProduct/:id',protect,Product.DeleteProduct)
+router.get('/searchProducts',Product.searchProducts)
 
 export default router

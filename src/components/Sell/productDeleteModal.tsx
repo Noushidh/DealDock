@@ -21,6 +21,7 @@ function ProductDeleteModal({ productId, onClose }: Props) {
       );
       dispatch(deleteProduct(response.data.id));
       notyf.success(response.data.message);
+      onClose()
     } catch (error: any) {
       notyf.error(error.response?.data?.message);
     }

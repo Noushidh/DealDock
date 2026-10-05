@@ -3,13 +3,12 @@ import authReducer from "../features/authslice";
 import productReducer from "../features/productSlice";
 import cartSlice from "../features/cartSlice"
 import checkoutSlice from "../features/checkoutSlice"
-
  export const store = configureStore({
   reducer: {
     auth: authReducer,
     product:productReducer,
     cart:cartSlice,
-    checkout:checkoutSlice
+    checkout:checkoutSlice,
   },
 });
 

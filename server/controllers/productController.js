@@ -16,6 +16,7 @@ export const AddProduct = async (req, res, next) => {
       price,
       description,
       images: imageUrls,
+      owner: req.user.id,
     });
     res
       .status(201)
@@ -55,6 +56,40 @@ export const DeleteProduct = async (req, res, next) => {
     const id = req.params.id;
     const product = await Product.findByIdAndDelete(id);
     res.status(200).json({ success: true, message: "delete successfully", id });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const searchProducts = async (req, res, next) => {
+  try {
+    const { title, price, page = 1, limit = 5 } = req.query;
+
+    let query = {};
+    if (title) {
+      query.title = { $regex: title, $options: "i" };
+    }
+    if (price === "0-1000") {
+      query.price = { $gte: 0, $lte: 1000 };
+    } else if (price === "1000-3000") {
+      query.price = { $gte: 1000, $lte: 3000 };
+    } else if (price === "3000-9000") {
+      query.price = { $gte: 3000, $lte: 9000 };
+    } else if (price === "9000+") {
+      query.price = { $gte: 9000 };
+    }
+    const currentPage = Number(page);
+    const perPage = Number(limit);
+    const totlaProducts = await Product.countDocuments(query);
+    const products = await Product.find(query)
+      .skip((currentPage - 1) * perPage)
+      .limit(perPage);
+    res.status(200).json({
+      totlaProducts,
+      currentPage,
+      totalPages: Math.ceil(totlaProducts / perPage),
+      products,
+    });
   } catch (error) {
     next(error);
   }

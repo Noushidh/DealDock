@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 import AddToCartButton from "../../components/cart/addTocart";
 import { fetchProducts } from "../../features/productThunk";
 import type { AppDispatch } from "../../app/store";
+import { searchProductsApi } from "../../api/productApi";
+import { setFilteredProducts } from "../../features/productSlice";
 
 type Props = {
   onEdit: (product: Product) => void;
@@ -16,28 +18,37 @@ function ProductListing({ onEdit, onDelete }: Props) {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
 
-  const { products, loading, error, price, search } = useSelector(
-    (state: RootState) => state.product,
-  );
-  const filteredProducts = products.filter((product) => {
-    const matchesSearch = product.title
-      .toLowerCase()
-      .includes(search.toLowerCase());
+  const user = useSelector((items: RootState) => items.auth.user);
+  console.log('user is',user);
 
-    let matchesPrice = true;
+  const { products, loading, error, currentPage, totalPages, search, price } =
+    useSelector((state: RootState) => state.product);
 
-    if (price === "0-1000") {
-      matchesPrice = product.price >= 0 && product.price <= 1000;
-    } else if (price === "1000-3000") {
-      matchesPrice = product.price > 1000 && product.price <= 3000;
-    } else if (price === "3000-9000") {
-      matchesPrice = product.price > 3000 && product.price <= 9000;
-    } else if (price === "9000+") {
-      matchesPrice = product.price > 9000;
+  const changePage = async (page: number) => {
+    const data = await searchProductsApi(search, price, page, 5);
+
+    dispatch(setFilteredProducts(data));
+  };
+
+  products.forEach((product) => {
+  console.log("User ID:", user?.id);
+  console.log("Owner:", product.owner);
+  console.log("Equal?", user?.id === product.owner);
+  console.log(typeof user?.id);
+console.log(typeof product.owner);
+});
+
+  const handleNext = () => {
+    if (currentPage < totalPages) {
+      changePage(currentPage + 1);
     }
+  };
 
-    return matchesSearch && matchesPrice;
-  });
+  const handlePrevious = () => {
+    if (currentPage > 1) {
+      changePage(currentPage - 1);
+    }
+  };
 
   useEffect(() => {
     dispatch(fetchProducts());
@@ -51,48 +62,111 @@ function ProductListing({ onEdit, onDelete }: Props) {
   }
 
   return (
-    <div className="border">
-      {filteredProducts.map((product) => (
-        <div key={product._id} className="border p-4 mb-4">
-          <div className="flex gap-2">
-            {product.images.map((image, index) => (
-              <img
-                key={index}
-                src={image}
-                alt={`${product.title}-${index}`}
-                className="w-40 h-40 object-cover"
-              />
+    <div className="max-w-7xl mx-auto px-6 py-8">
+      <h1 className="text-3xl font-bold mb-8">Products</h1>
+
+      {products.length === 0 ? (
+        <div className="bg-white rounded-xl shadow p-12 text-center">
+          <h2 className="text-2xl font-semibold text-gray-700">
+            No products found
+          </h2>
+          <p className="text-gray-500 mt-2">
+            Try changing the search or price filter.
+          </p>
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {products.map((product) => (
+              <div
+                key={product._id}
+                className="bg-white rounded-xl shadow-md hover:shadow-xl transition overflow-hidden"
+              >
+                <div className="h-56 overflow-hidden">
+                  <img
+                    src={product.images[0]}
+                    alt={product.title}
+                    className="w-full h-full object-cover hover:scale-105 transition duration-300"
+                  />
+                </div>
+
+                <div className="p-5">
+                  <h2 className="text-xl font-bold text-gray-800 line-clamp-1">
+                    {product.title}
+                  </h2>
+
+                  <p className="text-gray-500 mt-2 line-clamp-2">
+                    {product.description}
+                  </p>
+
+                  <p className="text-2xl font-bold text-green-600 mt-4">
+                    ₹{product.price}
+                  </p>
+
+                  <div className="flex gap-3 mt-5">
+                    <button
+                      onClick={() => navigate(`/product/${product._id}`)}
+                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg py-2"
+                    >
+                      View
+                    </button>
+                  </div>
+
+                  {user && (
+                    <>
+                      {user.id === product.owner ? (
+                        <div className="flex gap-2 mt-4">
+                          <button
+                            onClick={() => onEdit(product)}
+                            className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg py-2"
+                          >
+                            Edit
+                          </button>
+
+                          <button
+                            onClick={() => onDelete(product._id)}
+                            className="flex-1 bg-red-600 hover:bg-red-700 text-white rounded-lg py-2"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="mt-4">
+                          <AddToCartButton product={product} />
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
             ))}
           </div>
-          <h2>{product.title}</h2>
 
-          <p>{product.description}</p>
-
-          <p>₹{product.price}</p>
-
-          <button onClick={() => navigate(`/product/${product._id}`)}>
-            view
-          </button>
-
-          <AddToCartButton product={product} />
-
-          <div className="flex justify-end gap-2">
+          <div className="flex items-center justify-center gap-6 mt-10">
             <button
-              onClick={() => onEdit(product)}
-              className="rounded bg-blue-500 px-3 py-1 text-white hover:bg-blue-600"
+              onClick={handlePrevious}
+              disabled={currentPage === 1}
+              className="px-5 py-2 rounded-lg bg-gray-700 text-white hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed"
             >
-              Edit
+              Previous
             </button>
 
+            <div className="bg-white shadow rounded-lg px-6 py-2">
+              <span className="font-semibold">
+                Page {currentPage} of {totalPages}
+              </span>
+            </div>
+
             <button
-              onClick={() => onDelete(product._id)}
-              className="rounded bg-red-500 px-3 py-1 text-white hover:bg-red-600"
+              onClick={handleNext}
+              disabled={currentPage === totalPages}
+              className="px-5 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
             >
-              Delete{" "}
+              Next
             </button>
           </div>
-        </div>
-      ))}
+        </>
+      )}
     </div>
   );
 }

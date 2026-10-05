@@ -1,12 +1,12 @@
 import { useForm } from "react-hook-form";
-import type { Product } from "../../types/product";
+import type { Product, ProductForm } from "../../types/product";
 import axios from "axios";
 import notyf from "../../utils/notyf";
 import { useDispatch } from "react-redux";
 import { addProduct, updateProduct } from "../../features/productSlice";
 import type { RootState } from "../../app/store";
 import { useSelector } from "react-redux";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { getAuthHeader } from "../../utils/getAuthHeader";
 
 function ProductModal({
@@ -17,6 +17,7 @@ function ProductModal({
   isEdit: boolean;
 }) {
   const dispatch = useDispatch();
+  const [previews, setPreviews] = useState<string[]>([]);
 
   const selectedProduct = useSelector(
     (state: RootState) => state.product.selectedProduct,
@@ -28,8 +29,11 @@ function ProductModal({
     register,
     handleSubmit,
     reset,
+    watch,
     formState: { errors },
-  } = useForm<Product>();
+  } = useForm<ProductForm>();
+
+  const selectedImages = watch("images");
 
   useEffect(() => {
     if (isEdit && selectedProduct) {
@@ -37,12 +41,28 @@ function ProductModal({
         title: selectedProduct.title,
         description: selectedProduct.description,
         price: selectedProduct.price,
-        images: selectedProduct.images,
       });
     }
   }, [isEdit, selectedProduct, reset]);
 
-  const onSubmit = async (data: Product) => {
+  useEffect(() => {
+    if (!selectedImages || selectedImages.length === 0) {
+      setPreviews([]);
+      return;
+    }
+
+    const urls = Array.from(selectedImages).map((file) =>
+      URL.createObjectURL(file),
+    );
+
+    setPreviews(urls);
+
+    return () => {
+      urls.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [selectedImages]);
+
+  const onSubmit = async (data: ProductForm) => {
     try {
       const formData = new FormData();
 
@@ -79,8 +99,8 @@ function ProductModal({
     }
   };
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
-      <div className="w-full max-w-lg bg-white rounded-2xl shadow-xl p-8">
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div className="relative w-full max-w-lg rounded-2xl bg-white p-8 shadow-2xl">
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">
           Add Product
         </h2>
@@ -160,6 +180,20 @@ function ProductModal({
                 required: "Image is required",
               })}
             />
+
+            {previews.length > 0 && (
+              <div className="mt-4 flex flex-wrap gap-3">
+                {previews.map((url, index) => (
+                  <img
+                    key={index}
+                    src={url}
+                    alt={`Preview ${index}`}
+                    className="w-24 h-24 rounded-lg border object-cover"
+                  />
+                ))}
+              </div>
+            )}
+
             {errors.images && (
               <p className="text-red-500 text-sm mt-1">
                 {errors.images.message}
